@@ -80,32 +80,34 @@
   </div>
 
   <script>
-    // === TUS SONIDOS AQUÍ ===
+    // === SONIDOS ASIGNADOS ===
     const sounds = {
-      pad1: new Audio("A.mp3"),
-      pad2: new Audio("C.mp3"),
-      pad3: new Audio("E.mp3"),
-      pad4: new Audio("G.mp3")
+      pad1: new Audio("C.mp3"),  // Rojo
+      pad2: new Audio("E.mp3"),  // Azul
+      pad3: new Audio("G.mp3"),  // Amarillo
+      pad4: new Audio("A.mp3")   // Verde
     };
 
     // Pre-cargar los sonidos
     Object.values(sounds).forEach(audio => {
       audio.load();
+      audio.volume = 0.8; // Reducir volumen para evitar clipping
     });
 
     document.querySelectorAll('.pad').forEach(pad => {
       pad.addEventListener('pointerdown', () => {
         const id = pad.id;
         
-        // Detener todos los sonidos primero (opcional)
+        // Detener todos los sonidos primero
         Object.values(sounds).forEach(s => {
           s.pause();
           s.currentTime = 0;
         });
 
         // Reproducir el sonido
-        sounds[id].currentTime = 0;
-        sounds[id].play();
+        const audio = sounds[id];
+        audio.currentTime = 0.05; // Saltar primeros milisegundos para evitar clipping
+        audio.play();
 
         pad.classList.add('playing');
         setTimeout(() => pad.classList.remove('playing'), 300);
