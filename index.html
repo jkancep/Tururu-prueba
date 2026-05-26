@@ -79,40 +79,53 @@
     </div>
   </div>
 
-  <script>
-    // === SONIDOS ASIGNADOS ===
-    const sounds = {
-      pad1: new Audio("C.mp3"),  // Rojo
-      pad2: new Audio("E.mp3"),  // Azul
-      pad3: new Audio("G.mp3"),  // Amarillo
-      pad4: new Audio("A.mp3")   // Verde
-    };
+  // === CONFIGURACIÓN DE SONIDOS ===
+const sounds = {
+  pad1: new Audio("C.mp3"),
+  pad2: new Audio("E.mp3"),
+  pad3: new Audio("G.mp3"),
+  pad4: new Audio("A.mp3")
+};
 
-    // Pre-cargar los sonidos
-    Object.values(sounds).forEach(audio => {
-      audio.load();
-      audio.volume = 0.8; // Reducir volumen para evitar clipping
-    });
+// Volumen y precarga
+Object.values(sounds).forEach(audio => {
+  audio.volume = 0.8;
+  audio.load();
+});
 
-    document.querySelectorAll('.pad').forEach(pad => {
-      pad.addEventListener('pointerdown', () => {
-        const id = pad.id;
-        
-        // Detener todos los sonidos primero
-        Object.values(sounds).forEach(s => {
-          s.pause();
-          s.currentTime = 0;
-        });
+// Control de reproducciones activas
+let activeClones = 0;
+const MAX_CLONES = 4;
 
-        // Reproducir el sonido
-        const audio = sounds[id];
-        audio.currentTime = 0;
-        audio.play();
+// Reproducir con límite
+function playSound(originalAudio) {
+  if (activeClones >= MAX_CLONES) return;
+  
+  const clone = originalAudio.cloneNode();
+  clone.volume = originalAudio.volume;
+  clone.currentTime = 0;
+  
+  activeClones++;
+  clone.play();
+  
+  clone.onended = () => {
+    clone.remove();
+    activeClones--;
+  };
+}
 
-        pad.classList.add('playing');
-        setTimeout(() => pad.classList.remove('playing'), 300);
-      });
-    });
+// Eventos de los botones
+document.querySelectorAll('.pad').forEach(pad => {
+  pad.addEventListener('pointerdown', (e) => {
+    playSound(sounds[pad.id]);
+    
+    // Efecto visual
+    pad.classList.add('playing');
+    setTimeout(() => pad.classList.remove('playing'), 200);
+    
+    e.preventDefault();
+  });
+
   </script>
 </body>
 </html>
