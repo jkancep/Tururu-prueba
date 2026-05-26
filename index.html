@@ -106,7 +106,7 @@
 
         // Reproducir el sonido
         const audio = sounds[id];
-        audio.currentTime = 0.05; // Saltar primeros milisegundos para evitar clipping
+        audio.currentTime = 0;
         audio.play();
 
         pad.classList.add('playing');
