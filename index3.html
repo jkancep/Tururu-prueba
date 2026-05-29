@@ -1,0 +1,78 @@
+<script>
+  // === SONIDOS ASIGNADOS ===
+  const sounds = {
+    pad1: new Audio("SO1.mp3"),
+    pad2: new Audio("SO2.mp3"),
+    pad3: new Audio("SO3.mp3"),
+    pad4: new Audio("SO4.mp3")
+  };
+
+  // === OPTIMIZACIÓN DE AUDIO ===
+  Object.values(sounds).forEach(audio => {
+    audio.volume = 0.8;
+    audio.preload = "auto";
+    audio.load();
+  });
+
+  // Despertar audio en el primer toque
+  document.addEventListener('pointerdown', () => {
+    Object.values(sounds).forEach(audio => {
+      audio.play()
+        .then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+        })
+        .catch(() => {});
+    });
+  }, { once: true });
+
+  // Control de clones activos
+  const clonesActivos = {
+    pad1: 0,
+    pad2: 0,
+    pad3: 0,
+    pad4: 0
+  };
+
+  const MAX_CLONES_POR_SONIDO = 6;
+
+  function playSoundWithoutStopping(audioOriginal, padId) {
+
+    if (clonesActivos[padId] >= MAX_CLONES_POR_SONIDO) return;
+
+    const clone = audioOriginal.cloneNode();
+
+    clone.volume = audioOriginal.volume;
+    clone.currentTime = 0;
+
+    clonesActivos[padId]++;
+
+    clone.play().catch(() => {
+      clonesActivos[padId]--;
+    });
+
+    clone.onended = () => {
+      clonesActivos[padId]--;
+    };
+  }
+
+  // === BOTONES ===
+  document.querySelectorAll('.pad').forEach(pad => {
+
+    pad.addEventListener('pointerdown', () => {
+
+      const id = pad.id;
+      const audio = sounds[id];
+
+      playSoundWithoutStopping(audio, id);
+
+      pad.classList.add('playing');
+
+      setTimeout(() => {
+        pad.classList.remove('playing');
+      }, 120);
+
+    });
+
+  });
+</script>
